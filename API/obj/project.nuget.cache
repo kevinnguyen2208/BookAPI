@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "2GSoBqL69pRveaz1oh9egzLl4E11nSTv4kl4gL9TNCosoAzNIjgulBv14KZASRnMBd73oCJuXIXu5GdvMzmzZA==",
+  "dgSpecHash": "HKKqLob4aeRBOcbnNrPeJbbxxPEokPqICsTUALfxrK6SjdmkpvzUZ8qcQ+ut/TtqFAFW2jhvynswHSnEgTC/Yw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\KevinNguyen\\OneDrive - ingenuous.com.au\\Desktop\\Book\\API\\API.csproj",
+  "projectFilePath": "C:\\Users\\KevinNguyen\\OneDrive - ingenuous.com.au\\Desktop\\Book\\BookAPI\\API\\API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\KevinNguyen\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\KevinNguyen\\.nuget\\packages\\microsoft.entityframeworkcore\\8.0.7\\microsoft.entityframeworkcore.8.0.7.nupkg.sha512",

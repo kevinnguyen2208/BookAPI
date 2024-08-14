@@ -16,43 +16,31 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllBooks()
+        [StatusCodeHandler(Return200ForInvalid = true)]
+        public async Task<ServiceResult<IEnumerable<BookViewModel>>> GetAllBooks()
         {
-            ServiceResult<IEnumerable<BookViewModel>> res = await _bookService.GetAllBooks();
-            return HandleReturn(res);
+            return await _bookService.GetAllBooks();
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetBookById(Guid id)
+        [StatusCodeHandler]
+        public async Task<ServiceResult<BookViewModel>> GetBookById(int id)
         {
-            ServiceResult<BookViewModel> res = await _bookService.GetBookById(id);
-            return HandleReturn(res);
+            return await _bookService.GetBookById(id);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateBook([FromBody] BookDto request)
+        [StatusCodeHandler]
+        public async Task<ServiceResult<BookViewModel>> CreateBook([FromBody] BookDto request)
         {
-            ServiceResult<Guid> res = await _bookService.CreateBook(request);
-            return HandleReturn(res);
+            return await _bookService.CreateBook(request);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBook(Guid id, [FromBody] BookDto request)
+        [StatusCodeHandler]
+        public async Task<ServiceResult<BookViewModel>> UpdateBook(int id, [FromBody] BookDto request)
         {
-            ServiceResult<Guid> res = await _bookService.UpdateBook(id, request);
-            return HandleReturn(res);
-        }
-
-        /// <summary>
-        /// Generic function to handle the same return logic
-        /// </summary>
-        private IActionResult HandleReturn<T>(ServiceResult<T> res)
-        {
-            if (res.Validation == ValidationTypes.Invalid)
-            {
-                return BadRequest(res.Message);
-            }
-            return Ok(res.Value);
+            return await _bookService.UpdateBook(id, request);
         }
     }
 }

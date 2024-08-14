@@ -8,6 +8,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = APITest
-build_property.ProjectDir = C:\Users\KevinNguyen\OneDrive - ingenuous.com.au\Desktop\Book\APITest\
+build_property.ProjectDir = C:\Users\KevinNguyen\OneDrive - ingenuous.com.au\Desktop\Book\BookAPI\APITest\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 

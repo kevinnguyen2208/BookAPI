@@ -22,7 +22,8 @@ namespace APITest
             _service = SP.GetRequiredService<IBookService>();
         }
 
-        private Dictionary<Guid, BookWithIdDto> BookStorage = new Dictionary<Guid, BookWithIdDto>();
+        private Dictionary<int, BookWithIdDto> BookStorage = new Dictionary<int, BookWithIdDto>();
+        private int IDCount = 0;
 
         /// <summary>
         /// Mock book repository and its functions
@@ -34,8 +35,8 @@ namespace APITest
             _ = mock.Setup(s => s.GetAllBooks())
                 .ReturnsAsync(BookStorage.Values.ToViewModel);
 
-            _ = mock.Setup(s => s.GetBookById(It.IsAny<Guid>()))
-                .ReturnsAsync((Guid id) =>
+            _ = mock.Setup(s => s.GetBookById(It.IsAny<int>()))
+                .ReturnsAsync((int id) =>
                 {
                     if (BookStorage.TryGetValue(id, out var book))
                     {
@@ -55,7 +56,7 @@ namespace APITest
                 {
                     BookWithIdDto book = new BookWithIdDto()
                     {
-                        Id = Guid.NewGuid(),
+                        Id = IDCount++,
                         Title = request.Title,
                         Author = request.Author,
                         ISBN = request.ISBN,
@@ -63,11 +64,11 @@ namespace APITest
                     };
 
                     BookStorage.Add(book.Id, book);
-                    return book.Id;
+                    return book.ToViewModel();
                 });
 
-            _ = mock.Setup(s => s.UpdateBook(It.IsAny<Guid>(), It.IsAny<BookDto>()))
-                .ReturnsAsync((Guid id, BookDto request) =>
+            _ = mock.Setup(s => s.UpdateBook(It.IsAny<int>(), It.IsAny<BookDto>()))
+                .ReturnsAsync((int id, BookDto request) =>
                 {
                     BookWithIdDto book = new BookWithIdDto()
                     {
@@ -79,33 +80,31 @@ namespace APITest
                     };
 
                     BookStorage[id] = book;
-                    return id;
+                    return book.ToViewModel();
                 });
 
             SC.AddScoped(_ => mock.Object);
         }
 
         [Theory]
-        [InlineData(null, "Valid Title", "1234567890", "2024-08-10", false)]
-        [InlineData("Valid Author", null, "1234567890", "2024-08-10", false)]
-        [InlineData("Valid Author", "Valid Title", null, "2024-08-10", false)]
-        [InlineData("Valid Author", "Valid Title", "1234567890", null, false)]
-        [InlineData("", "Valid Title", "1234567890", "2024-08-10", false)]
-        [InlineData("Valid Author", "", "1234567890", "2024-08-10", false)]
-        [InlineData("Valid Author", "Valid Title", "", "2024-08-10", false)]
-        [InlineData("Valid Author", "Valid Title", "1234567890", "", false)]
-        [InlineData("Valid Author", "Valid Title", "1234567890", "2024-08-10", true)]
+        [InlineData(null, "Valid Title", "1234567890", false)]
+        [InlineData("Valid Author", null, "1234567890", false)]
+        [InlineData("Valid Author", "Valid Title", null, false)]
+        [InlineData("", "Valid Title", "1234567890", false)]
+        [InlineData("Valid Author", "", "1234567890", false)]
+        [InlineData("Valid Author", "Valid Title", "", false)]
+        [InlineData("Valid Author", "Valid Title", "1234567890", true)]
 
-        public async Task ValidateParameters(string? author, string? title, string? isbn, string? publishedDate, bool isValid)
+        public async Task ValidateParameters(string? author, string? title, string? isbn, bool isValid)
         {
             BookDto book = new BookDto()
             {
                 Author = author,
                 Title = title,
                 ISBN = isbn,
-                PublishedDate = publishedDate
+                PublishedDate = DateTime.UtcNow
             };
-            ServiceResult<Guid> res = await _service.CreateBook(book);
+            ServiceResult<BookViewModel> res = await _service.CreateBook(book);
             if (isValid)
             {
                 Assert.Equal(ValidationTypes.None, res.Validation);
@@ -113,33 +112,6 @@ namespace APITest
             else
             {
                 Assert.Equal(ValidationTypes.Invalid, res.Validation);
-            }
-        }
-
-        [Theory]
-        [InlineData("2029-1-10", false)]
-        [InlineData("2023-1-32", false)]
-        [InlineData("2023-13-30", false)]
-        [InlineData("2027-0-1", false)]
-        [InlineData("20240-02-12", false)]
-        [InlineData("2024-02-12", true)]
-        public async Task ValidateValidPublishedDate(string publishedDate, bool isValid)
-        {
-            BookDto book = new BookDto()
-            {
-                Author = "a",
-                Title = "t",
-                ISBN = "i",
-                PublishedDate = publishedDate
-            };
-            ServiceResult<Guid> serviceResult = await _service.CreateBook(book);
-            if (isValid)
-            {
-                Assert.Equal(ValidationTypes.None, serviceResult.Validation);
-            }
-            else
-            {
-                Assert.Equal(ValidationTypes.Invalid, serviceResult.Validation);
             }
         }
 
@@ -153,12 +125,12 @@ namespace APITest
                 Author = "a",
                 Title = "t",
                 ISBN = "0",
-                PublishedDate = "2024-09-01"
+                PublishedDate = DateTime.UtcNow
             };
             await _service.CreateBook(book);
 
             book.ISBN = isbn;
-            ServiceResult<Guid> res = await _service.CreateBook(book);
+            ServiceResult<BookViewModel> res = await _service.CreateBook(book);
             if (isValid)
             {
                 Assert.Equal(ValidationTypes.None, res.Validation);
@@ -179,20 +151,20 @@ namespace APITest
                 Author = "a",
                 Title = "t",
                 ISBN = "0",
-                PublishedDate = "2024-09-01"
+                PublishedDate = DateTime.UtcNow
             };
             BookWithIdDto book2 = new BookWithIdDto()
             {
                 Author = "a2",
                 Title = "t2",
                 ISBN = "2",
-                PublishedDate = "2024-09-01"
+                PublishedDate = DateTime.UtcNow
             };
-            ServiceResult<Guid> create = await _service.CreateBook(book);
-            ServiceResult<Guid> create2 = await _service.CreateBook(book2);
+            ServiceResult<BookViewModel> create = await _service.CreateBook(book);
+            ServiceResult<BookViewModel> create2 = await _service.CreateBook(book2);
 
             book2.ISBN = isbn;
-            ServiceResult<Guid> res = await _service.UpdateBook(create2.Value, book2);
+            ServiceResult<BookViewModel> res = await _service.UpdateBook(create2.Value.Id, book2);
             if (isValid)
             {
                 Assert.Equal(ValidationTypes.None, res.Validation);
@@ -211,23 +183,23 @@ namespace APITest
                 Author = "a",
                 Title = "t",
                 ISBN = "i",
-                PublishedDate = "2024-09-01"
+                PublishedDate = DateTime.UtcNow
             };
-            ServiceResult<Guid> res = await _service.CreateBook(book);
-            Assert.NotNull(BookStorage[res.Value]);
+            ServiceResult<BookViewModel> res = await _service.CreateBook(book);
+            Assert.NotNull(BookStorage[res.Value.Id]);
         }
 
         [Fact]
         public async Task UpdateBook()
         {
-            Guid id = Guid.NewGuid();
+            int id = 0;
             BookWithIdDto book = new BookWithIdDto()
             {
                 Id = id,
                 Author = "a",
                 Title = "t",
                 ISBN = "i",
-                PublishedDate = "2024-09-01"
+                PublishedDate = DateTime.UtcNow
             };
             BookStorage.Add(id, book);
 
@@ -245,7 +217,7 @@ namespace APITest
                 Author = "a",
                 Title = "t",
                 ISBN = "0",
-                PublishedDate = "2024-09-02"
+                PublishedDate = DateTime.UtcNow
             };
             await _service.CreateBook(book);
 
@@ -254,7 +226,7 @@ namespace APITest
                 Author = "b",
                 Title = "f",
                 ISBN = "1",
-                PublishedDate = "2024-09-01"
+                PublishedDate = DateTime.UtcNow
             };
             await _service.CreateBook(book2);
 
@@ -280,12 +252,12 @@ namespace APITest
                 Author = "a",
                 Title = "t",
                 ISBN = "223123",
-                PublishedDate = "2024-09-01"
+                PublishedDate = DateTime.UtcNow
             };
-            ServiceResult<Guid> create = await _service.CreateBook(book);
+            ServiceResult<BookViewModel> create = await _service.CreateBook(book);
 
-            ServiceResult<BookViewModel> res = await _service.GetBookById(create.Value);
-            Assert.Equal(create.Value, res.Value.Id);
+            ServiceResult<BookViewModel> res = await _service.GetBookById(create.Value.Id);
+            Assert.Equal(create.Value.Id, res.Value.Id);
             Assert.Equal("223123", res.Value.ISBN);
         }
     }

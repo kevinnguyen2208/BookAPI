@@ -2,8 +2,6 @@
 using API.Models;
 using API.Mappers;
 using Microsoft.EntityFrameworkCore;
-using static System.Reflection.Metadata.BlobBuilder;
-
 namespace API.Repositories
 {
     public class BookRepository : IBookRepository
@@ -20,7 +18,7 @@ namespace API.Repositories
             return (await _context.Books.ToArrayAsync()).ToViewModel();
         }
 
-        public async Task<BookViewModel> GetBookById(Guid id)
+        public async Task<BookViewModel> GetBookById(int id)
         {
             return (await _context.Books.FindAsync(id)).ToViewModel();
         }
@@ -36,11 +34,10 @@ namespace API.Repositories
             return allBooks.Where(bookDelegate).FirstOrDefault();
         }
 
-        public async Task<Guid> CreateBook(BookDto request)
+        public async Task<BookViewModel> CreateBook(BookDto request)
         {
             BookWithIdDto book = new BookWithIdDto()
             {
-                Id = Guid.NewGuid(),
                 Author = request.Author,
                 Title = request.Title,
                 ISBN = request.ISBN,
@@ -50,10 +47,10 @@ namespace API.Repositories
 
             await _context.Books.AddAsync(book);
             await _context.SaveChangesAsync();
-            return book.Id;
+            return book.ToViewModel();
         }
 
-        public async Task<Guid> UpdateBook(Guid id, BookDto request)
+        public async Task<BookViewModel> UpdateBook(int id, BookDto request)
         {
             BookWithIdDto book = await _context.Books.FindAsync(id);
 
@@ -69,7 +66,7 @@ namespace API.Repositories
 
             _context.Books.Update(book);
             await _context.SaveChangesAsync();
-            return book.Id;
+            return book.ToViewModel();
         }
     }
 }

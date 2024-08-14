@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Ez5aPVACOpgOhMQ3GxrhNRk/Y1fRE2AY9QzzyB6wh6Cp7E5nDgaIGDyKGBvY7seVDHceytqz7aWvrsYZmsiGRA==",
+  "dgSpecHash": "EXRLpoB29Em2ytvX0WNRPq0x2RauDAdLr7t/7GAnqUBtQCnYKGpUutL2RryXp0j5aTAh5EVlbqN2//0gX6sDdQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\KevinNguyen\\OneDrive - ingenuous.com.au\\Desktop\\Book\\APITest\\APITest.csproj",
+  "projectFilePath": "C:\\Users\\KevinNguyen\\OneDrive - ingenuous.com.au\\Desktop\\Book\\BookAPI\\APITest\\APITest.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\KevinNguyen\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\KevinNguyen\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",
