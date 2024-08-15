@@ -1,4 +1,5 @@
 using API.Data;
+using API.Middleware;
 using API.Repositories;
 using API.Services;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseInMemoryDatabase("Books"));
 
 var app = builder.Build();
+
+app.UseMiddleware<HeaderMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
