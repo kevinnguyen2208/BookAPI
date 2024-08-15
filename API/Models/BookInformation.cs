@@ -5,7 +5,7 @@
         public string Title { get; set; }
         public string Author { get; set; }
         public string ISBN { get; set; }
-        public DateTimeOffset PublishedDate { get; set; }
+        public DateTime PublishedDate { get; set; }
     }
 
     public class BookWithIdDto : BookDto
